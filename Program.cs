@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 
@@ -92,7 +91,7 @@ class Program
 
                 if (cityId < 0 || cityId >= cities.Count)
                 {
-                    Console.WriteLine("Invalid City ID. Please enter again.");
+                    Console.WriteLine("Invalid City ID");
                     continue;
                 }
 
@@ -129,68 +128,44 @@ class Program
                 cities[cityId].InfectionLevel = 0;
                 SpreadInfectionFromCity(cityId);
                 break;
-case "Lockdown":
-            if (cityId >= 0 && cityId < cities.Count)
-            {
-                // Reduce infection level for the specified city
-                cities[cityId].InfectionLevel = Math.Max(0, cities[cityId].InfectionLevel - 1);
-
-                // Reduce infection level for connected cities
-                foreach (int connectedCityId in cities[cityId].ConnectedCityIds)
-                {
-                    cities[connectedCityId].InfectionLevel = Math.Max(0, cities[connectedCityId].InfectionLevel - 1);
-                }
-            }
-            else
-            {
-                Console.WriteLine("Invalid City ID. Please enter again.");
+            case "Lockdown":
+                cities[cityId].InfectionLevel = 0;
+                break;
+            default:
+                Console.WriteLine("Invalid event type.");
                 return;
-            }
-            break;
-        default:
-            Console.WriteLine("Invalid event type.");
-            return;
-    }
+        }
         Console.WriteLine("Updated City Details:");
         DisplayCityDetails();
     }
 
-static void SpreadInfection()
-{
-    bool infectionSpread = false;
-
-    foreach (City city in cities)
+    static void SpreadInfection()
     {
-        bool hasHigherInfectionLevel = false;
+        bool infectionSpread = false;
 
-        foreach (int connectedCityId in city.ConnectedCityIds)
+        foreach (City city in cities)
         {
-            if (cities[connectedCityId].InfectionLevel > city.InfectionLevel)
+            foreach (int connectedCityId in city.ConnectedCityIds)
             {
-                hasHigherInfectionLevel = true;
-                break;
+                if (city.InfectionLevel > cities[connectedCityId].InfectionLevel)
+                {
+                    cities[connectedCityId].InfectionLevel++;
+                    infectionSpread = true;
+                }
             }
         }
 
-        if (hasHigherInfectionLevel)
+        if (infectionSpread)
         {
-            city.InfectionLevel++;
-            infectionSpread = true;
+            Console.WriteLine("Infection spread to connected cities.");
+            Console.WriteLine("Updated City Details:");
+            DisplayCityDetails();
+        }
+        else
+        {
+            Console.WriteLine("No infection spread to connected cities.");
         }
     }
-
-    if (infectionSpread)
-    {
-        Console.WriteLine("Infection spread to connected cities.");
-    }
-    else
-    {
-        Console.WriteLine("No infection spread to connected cities.");
-    }
-
-    Console.WriteLine("Updated City Details:");
-    DisplayCityDetails();
-}
 
     static void SpreadInfectionFromCity(int cityId)
     {
@@ -219,4 +194,3 @@ static void SpreadInfection()
         }
     }
 }
-
